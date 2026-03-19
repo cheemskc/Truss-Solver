@@ -22,6 +22,12 @@ st.markdown("""
         font-size: 1.15rem; font-weight: 700; 
         margin-bottom: 0.8rem; border-left: 4px solid #1f77b4; padding-left: 10px; 
     }
+    
+    /* 专为底部居中标题设置的样式 */
+    .section-title-center {
+        font-size: 1.25rem; font-weight: 700; 
+        margin-bottom: 1.5rem; text-align: center; color: #f8f9fa;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -60,7 +66,6 @@ col_left, col_right = st.columns([2.2, 1.0], gap="large")
 # 👈 左侧面板：原生可编辑表格 UI
 # ------------------------------------------
 with col_left:
-    # --- 🔴 节点信息 ---
     st.markdown("<div class='section-title'>📍 节点信息</div>", unsafe_allow_html=True)
     st.caption("✨ 提示：直接点击单元格编辑。点击表格最下方可添加新行，选中行后按 Delete 键可删除。")
     
@@ -85,7 +90,6 @@ with col_left:
 
     st.markdown("<div style='height: 20px'></div>", unsafe_allow_html=True)
 
-    # --- 🔵 单元信息 ---
     st.markdown("<div class='section-title'>🔗 单元信息</div>", unsafe_allow_html=True)
     
     valid_node_ids = edited_nodes['ID'].dropna().astype(int).astype(str).tolist() if not edited_nodes.empty else []
@@ -111,7 +115,6 @@ with col_left:
         key="elem_editor"
     )
 
-    # 🚀 求解计算
     st.markdown("<div style='height: 30px'></div>", unsafe_allow_html=True)
     if st.button("🚀 执行矩阵位移法求解 (Solve Structure)", type="primary", use_container_width=True):
         try:
@@ -155,7 +158,7 @@ with col_left:
 
 
 # ------------------------------------------
-# 👉 右侧面板：拓扑图
+# 👉 右侧面板：拓扑图 (撑满空间)
 # ------------------------------------------
 with col_right:
     
@@ -178,44 +181,51 @@ with col_right:
         nx = [n.x for n in nodes_dict_viz.values()]; ny = [n.y for n in nodes_dict_viz.values()]; nt = [f"N{nid}" for nid in nodes_dict_viz.keys()]
         fig.add_trace(go.Scatter(x=nx, y=ny, mode='markers+text', marker=dict(color='#d62728', size=10, line=dict(color='white', width=1)), text=nt, textposition="top right", textfont=dict(color='#343a40', size=15, weight="bold"), hoverinfo='none', showlegend=False))
 
+    # 🌟 核心修改：高度从 380 增加到 550，同时极限压缩图表内边距，使其充满整个右侧盒子
     fig.update_layout(
-        template="plotly_white", margin=dict(l=20, r=20, t=10, b=10),
+        template="plotly_white", 
+        margin=dict(l=10, r=10, t=10, b=10),
         xaxis=dict(showgrid=True, gridcolor='#e9ecef', mirror=True, ticks='outside', showline=True, linecolor='#adb5bd'),
         yaxis=dict(showgrid=True, gridcolor='#e9ecef', mirror=True, ticks='outside', showline=True, linecolor='#adb5bd', scaleanchor="x", scaleratio=1),
-        plot_bgcolor='white', paper_bgcolor='white', dragmode='pan', height=380 
+        plot_bgcolor='white', paper_bgcolor='white', dragmode='pan', 
+        height=550 
     )
     st.plotly_chart(fig, use_container_width=True, config={'displaylogo': False}, theme=None)
 
 
 # ==========================================
-# 5. 底部面板：一左一右展示计算结果
+# 5. 底部面板：全局居中展示结果
 # ==========================================
-st.markdown("<hr style='margin: 1.5rem 0;'>", unsafe_allow_html=True)
+st.markdown("<hr style='margin: 1.5rem 0; border-color: #343a40;'>", unsafe_allow_html=True)
 
 if st.session_state['analysis_results'] is not None:
-    st.markdown("<div class='section-title'>📊 计算结果报告</div>", unsafe_allow_html=True)
+    # 🌟 核心修改：独立的居中大标题
+    st.markdown("<div class='section-title-center'>📊 计算结果报告</div>", unsafe_allow_html=True)
     
     res = st.session_state['analysis_results']
     df_d = res['disp']
     df_f = res['force']
     
-    # 全局核心指标
-    m1, m2, m3 = st.columns(3)
-    m1.metric("Max |Ux|", f"{df_d['Ux (m)'].abs().max() * 1000:.2f} mm")
-    m2.metric("Max |Uy|", f"{df_d['Uy (m)'].abs().max() * 1000:.2f} mm")
-    m3.metric("Max |M|", f"{df_f['M 弯矩(kN·m)'].abs().max():.2f} kN·m")
+    # 🌟 核心修改：利用空列占位，把三大指标强行挤到屏幕正中间
+    spacer1, m1, m2, m3, spacer2 = st.columns([1.5, 2, 2, 2, 1.5])
+    with m1:
+        st.metric("Max |Ux|", f"{df_d['Ux (m)'].abs().max() * 1000:.2f} mm")
+    with m2:
+        st.metric("Max |Uy|", f"{df_d['Uy (m)'].abs().max() * 1000:.2f} mm")
+    with m3:
+        st.metric("Max |M|", f"{df_f['M 弯矩(kN·m)'].abs().max():.2f} kN·m")
     
-    st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
     
-    # 🌟 底部双列布局：一左一右展开表格
-    res_col_left, res_col_right = st.columns([1, 1.2], gap="large") # 内力表列稍多，给 1.2 的宽度
+    # 🌟 核心修改：严格 1:1 等宽的表格布局
+    res_col_left, res_col_right = st.columns(2, gap="large") 
     
     with res_col_left:
-        st.markdown("<div style='font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; color: #1f77b4;'>📍 节点位移矩阵 [ U ]</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; color: #1f77b4;'><span style='color: white;'>📍</span> 节点位移矩阵 [ U ]</div>", unsafe_allow_html=True)
         st.dataframe(df_d.style.set_properties(**{'font-size': '1.05rem', 'padding': '6px'}).format("{:.5e}"), use_container_width=True)
         
     with res_col_right:
-        st.markdown("<div style='font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; color: #d62728;'>🔪 单元局部内力矩阵 [ f ]</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; color: #d62728;'><span style='color: white;'>🔪</span> 单元局部内力矩阵 [ f ]</div>", unsafe_allow_html=True)
         st.dataframe(df_f.style.set_properties(**{'font-size': '1.05rem', 'padding': '6px'}).format("{:.4f}"), use_container_width=True)
         
 else:
