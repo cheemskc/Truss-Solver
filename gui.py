@@ -197,7 +197,7 @@ with col_right:
 st.markdown("<hr style='margin: 1.5rem 0; border-color: #343a40;'>", unsafe_allow_html=True)
 
 if st.session_state['analysis_results'] is not None:
-    st.markdown("<div class='section-title-center'>📊 计算结果报告</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-title-center'>📊 计算结果</div>", unsafe_allow_html=True)
     
     res = st.session_state['analysis_results']
     df_d = res['disp']
@@ -216,11 +216,11 @@ if st.session_state['analysis_results'] is not None:
     res_col_left, res_col_right = st.columns(2, gap="large") 
     
     with res_col_left:
-        st.markdown("<div style='font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; color: #1f77b4;'><span style='color: white;'>📍</span> 节点位移矩阵 [ U ]</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; color: #1f77b4;'><span style='color: white;'>📍</span> 节点位移 [ U ]</div>", unsafe_allow_html=True)
         st.dataframe(df_d.style.set_properties(**{'font-size': '1.05rem', 'padding': '6px'}).format("{:.5e}"), use_container_width=True)
         
     with res_col_right:
-        st.markdown("<div style='font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; color: #d62728;'><span style='color: white;'>🔪</span> 单元局部内力矩阵 [ f ]</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; color: #d62728;'><span style='color: white;'>🔗</span> 单元两端内力 [ f ]</div>", unsafe_allow_html=True)
         st.dataframe(df_f.style.set_properties(**{'font-size': '1.05rem', 'padding': '6px'}).format("{:.4f}"), use_container_width=True)
         
 else:
