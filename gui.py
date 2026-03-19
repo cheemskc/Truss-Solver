@@ -13,93 +13,33 @@ st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
     html, body, [class*="css"] { font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; }
-    
     .block-container { padding-top: 1.5rem; max-width: 98%; }
     
-    /* 🌟 输入框矩阵化 */
-    .stNumberInput > div > div > input, .stSelectbox > div > div > select { 
-        border-radius: 4px !important; 
-        font-size: 0.95rem !important;
-        padding: 4px 8px !important;
-        border: 1px solid #e9ecef;
-        background-color: #fcfcfc;
-    }
-    .stNumberInput > div > div > input:focus { background-color: #ffffff; border-color: #1f77b4; box-shadow: none; }
-    label[data-testid="stWidgetLabel"] { display: none !important; }
-    
-    /* 🌟 彻底修复复选框居中问题 */
-    div[data-testid="stCheckbox"] { 
-        display: flex; 
-        justify-content: center !important; /* 外部容器居中 */
-        align-items: center !important; 
-        padding-top: 6px; 
-    }
-    div[data-testid="stCheckbox"] label {
-        width: auto !important; /* 剥夺内部标签的满宽属性 */
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-    
-    /* 表头色彩与层级 */
-    .header-group {
-        text-align: center; font-weight: 600; color: white;
-        padding: 6px 0; border-radius: 4px 4px 0 0; font-size: 0.95rem;
-    }
-    .bg-coord { background-color: #34495e; } 
-    .bg-const { background-color: #7f8c8d; } 
-    .bg-loads { background-color: #c0392b; } 
-    
-    .table-subheader { 
-        text-align: center; font-size: 0.8rem; color: #868e96; font-weight: 600;
-        border-bottom: 2px solid #e9ecef; padding-bottom: 4px; margin-bottom: 8px; margin-top: 4px;
-    }
-    
-    .row-badge {
-        background-color: #f1f3f5; color: #343a40; font-weight: 700; font-size: 0.9rem;
-        text-align: center; padding: 6px 0; border-radius: 4px; border-left: 4px solid #adb5bd;
-        margin-top: 3px;
-    }
-    
-    div[data-testid="column"] { padding: 0 4px !important; }
-    hr.row-divider { margin: 4px 0 8px 0; border-color: #f8f9fa; }
-    
-    .section-title { 
-        font-size: 1.15rem; font-weight: 700; 
-        margin-bottom: 0.8rem; border-left: 4px solid #1f77b4; padding-left: 10px; 
-    }
+    /* 优化表格外观，使其更贴近专业工程软件 */
+    [data-testid="stDataFrame"] { border: 1px solid #e9ecef; border-radius: 6px; }
+    .section-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.8rem; border-left: 4px solid #1f77b4; padding-left: 10px; color: #212529;}
     </style>
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 2. 状态管理
+# 2. 状态管理 (重构为纯 DataFrame，适配 data_editor)
 # ==========================================
-if 'nodes_data' in st.session_state and isinstance(st.session_state['nodes_data'], pd.DataFrame):
-    st.session_state['nodes_data'] = st.session_state['nodes_data'].to_dict('records')
-if 'elems_data' in st.session_state and isinstance(st.session_state['elems_data'], pd.DataFrame):
-    st.session_state['elems_data'] = st.session_state['elems_data'].to_dict('records')
-
-if 'nodes_data' not in st.session_state:
-    st.session_state['nodes_data'] = [
+if 'df_nodes' not in st.session_state:
+    st.session_state.df_nodes = pd.DataFrame([
         {"ID": 1, "X": 0.0, "Y": 0.0, "固X": False, "固Y": True, "固转": False, "Fx": 0.0, "Fy": 0.0, "Mz": 0.0},
         {"ID": 2, "X": 4.0, "Y": 0.0, "固X": False, "固Y": False, "固转": False, "Fx": 0.0, "Fy": 0.0, "Mz": 0.0},
         {"ID": 3, "X": 8.0, "Y": 3.0, "固X": False, "固Y": True, "固转": False, "Fx": 0.0, "Fy": 0.0, "Mz": 0.0},
         {"ID": 4, "X": 4.0, "Y": -4.0, "固X": True, "固Y": True, "固转": True, "Fx": 0.0, "Fy": 0.0, "Mz": 0.0},
-    ]
+    ])
 
-if 'elems_data' not in st.session_state:
-    st.session_state['elems_data'] = [
-        {"ID": 1, "起点": 1, "终点": 2, "EA": 1e12, "EI": 4.0, "Fx_i": 0.0, "Fy_i": 0.0, "Mz_i": 0.0, "Fx_j": 0.0, "Fy_j": 0.0, "Mz_j": 0.0},
-        {"ID": 2, "起点": 2, "终点": 3, "EA": 1e12, "EI": 5.0, "Fx_i": 0.0, "Fy_i": 0.0, "Mz_i": 0.0, "Fx_j": 0.0, "Fy_j": 0.0, "Mz_j": 0.0},
-        {"ID": 3, "起点": 2, "终点": 4, "EA": 1e12, "EI": 4.0, "Fx_i": 0.0, "Fy_i": 24.0, "Mz_i": 16.0, "Fx_j": 0.0, "Fy_j": 24.0, "Mz_j": -16.0},
-    ]
+if 'df_elems' not in st.session_state:
+    st.session_state.df_elems = pd.DataFrame([
+        {"ID": 1, "起点": 1, "终点": 2, "EA": 1e12, "EI": 4.0, "Fxi": 0.0, "Fyi": 0.0, "Mzi": 0.0, "Fxj": 0.0, "Fyj": 0.0, "Mzj": 0.0},
+        {"ID": 2, "起点": 2, "终点": 3, "EA": 1e12, "EI": 5.0, "Fxi": 0.0, "Fyi": 0.0, "Mzi": 0.0, "Fxj": 0.0, "Fyj": 0.0, "Mzj": 0.0},
+        {"ID": 3, "起点": 2, "终点": 4, "EA": 1e12, "EI": 4.0, "Fxi": 0.0, "Fyi": 24.0, "Mzi": 16.0, "Fxj": 0.0, "Fyj": 24.0, "Mzj": -16.0},
+    ])
 
 if 'analysis_results' not in st.session_state: st.session_state['analysis_results'] = None
-
-def delete_node(idx): 
-    nid = st.session_state['nodes_data'][idx]['ID']
-    st.session_state['nodes_data'].pop(idx)
-    st.session_state['elems_data'] = [e for e in st.session_state['elems_data'] if e['起点'] != nid and e['终点'] != nid]
-def delete_elem(idx): st.session_state['elems_data'].pop(idx)
 
 # ==========================================
 # 3. 顶部标题
@@ -110,151 +50,133 @@ st.markdown("<hr style='margin-top: 0.5rem; margin-bottom: 1rem;'>", unsafe_allo
 # ==========================================
 # 4. 全局布局
 # ==========================================
-col_left, col_right = st.columns([1.6, 1.4], gap="large")
+col_left, col_right = st.columns([1.5, 1.5], gap="large")
 
 # ------------------------------------------
-# 👈 左侧面板：数据输入矩阵
+# 👈 左侧面板：原生可编辑数据表 (Data Editors)
 # ------------------------------------------
 with col_left:
-    # --- 🔴 节点 ---
-    st.markdown("<div class='section-title'>📍 节点信息</div>", unsafe_allow_html=True)
-    st.markdown("""
-        <div style='display: flex; width: 100%; gap: 4px;'>
-            <div style='flex: 1;' ></div>
-            <div style='flex: 2;' class='header-group bg-coord'>📍 坐标 (m)</div>
-            <div style='flex: 3;' class='header-group bg-const'>🔒 支座约束</div>
-            <div style='flex: 3.6;' class='header-group bg-loads'>🎯 节点集中荷载</div>
-            <div style='flex: 0.8;' ></div>
-        </div>
-    """, unsafe_allow_html=True)
     
-    node_widths = [1, 1, 1, 1, 1, 1, 1.2, 1.2, 1.2, 0.8]
-    n_cols = st.columns(node_widths)
-    headers = ["Node", "x", "y", "固定x", "固定y", "固定转角", "Fx (kN)", "Fy (kN)", "Mz (kN·m)", "操作"]
-    for i, h in enumerate(headers): n_cols[i].markdown(f"<div class='table-subheader'>{h}</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-title'>📍 节点模型参数 (Nodal Data)</div>", unsafe_allow_html=True)
+    st.caption("提示：双击单元格修改。点击表格最下方空白行添加新节点，选中行按 Delete 键删除。")
     
-    for i, node in enumerate(st.session_state['nodes_data']):
-        cols = st.columns(node_widths)
-        cols[0].markdown(f"<div class='row-badge'>N{node['ID']}</div>", unsafe_allow_html=True)
-        node['X'] = cols[1].number_input(f"nx{i}", value=float(node['X']), step=0.1, key=f"n_x_{i}", label_visibility="collapsed")
-        node['Y'] = cols[2].number_input(f"ny{i}", value=float(node['Y']), step=0.1, key=f"n_y_{i}", label_visibility="collapsed")
-        
-        # 居中显示的勾选框
-        node['固X'] = cols[3].checkbox(f"nfx{i}", value=bool(node['固X']), key=f"n_fx_{i}", label_visibility="collapsed")
-        node['固Y'] = cols[4].checkbox(f"nfy{i}", value=bool(node['固Y']), key=f"n_fy_{i}", label_visibility="collapsed")
-        node['固转'] = cols[5].checkbox(f"nfm{i}", value=bool(node['固转']), key=f"n_fm_{i}", label_visibility="collapsed")
-        
-        node['Fx'] = cols[6].number_input(f"nffx{i}", value=float(node['Fx']), step=1.0, key=f"n_ffx_{i}", label_visibility="collapsed")
-        node['Fy'] = cols[7].number_input(f"nffy{i}", value=float(node['Fy']), step=1.0, key=f"n_ffy_{i}", label_visibility="collapsed")
-        node['Mz'] = cols[8].number_input(f"nffm{i}", value=float(node['Mz']), step=1.0, key=f"n_ffm_{i}", label_visibility="collapsed")
-        if cols[9].button("✖", key=f"ndel_{i}"):
-            delete_node(i); st.rerun()
-        st.markdown("<hr class='row-divider'>", unsafe_allow_html=True)
+    # 🌟 节点表配置
+    edited_nodes = st.data_editor(
+        st.session_state.df_nodes,
+        num_rows="dynamic", # 开启自动增删行
+        use_container_width=True,
+        hide_index=True,
+        column_config={
+            "ID": st.column_config.NumberColumn("Node", required=True, step=1, format="%d"),
+            "X": st.column_config.NumberColumn("X (m)", default=0.0, format="%.2f"),
+            "Y": st.column_config.NumberColumn("Y (m)", default=0.0, format="%.2f"),
+            "固X": st.column_config.CheckboxColumn("固定X"),
+            "固Y": st.column_config.CheckboxColumn("固定Y"),
+            "固转": st.column_config.CheckboxColumn("固定转角"),
+            "Fx": st.column_config.NumberColumn("Fx (kN)", default=0.0),
+            "Fy": st.column_config.NumberColumn("Fy (kN)", default=0.0),
+            "Mz": st.column_config.NumberColumn("Mz (kN·m)", default=0.0),
+        },
+        key="node_editor"
+    )
 
-    if st.button("➕ 增加节点 (Add Node)", key="add_node_row"):
-        new_id = max([n['ID'] for n in st.session_state['nodes_data']] + [0]) + 1
-        st.session_state['nodes_data'].append({"ID": new_id, "X": 0.0, "Y": 0.0, "固X": False, "固Y": False, "固转": False, "Fx": 0.0, "Fy": 0.0, "Mz": 0.0})
-        st.rerun()
-
-    st.markdown("<div style='height: 30px'></div>", unsafe_allow_html=True)
-
-    # --- 🔵 单元 ---
-    st.markdown("<div class='section-title'>🔗 单元信息</div>", unsafe_allow_html=True)
-    st.markdown("""
-        <div style='display: flex; width: 100%; gap: 4px;'>
-            <div style='flex: 0.8;' ></div>
-            <div style='flex: 2;' class='header-group bg-coord'> 连接节点</div>
-            <div style='flex: 2;' class='header-group bg-const'> 材料属性</div>
-            <div style='flex: 3.3;' class='header-group bg-loads'>i 端等效节点荷载</div>
-            <div style='flex: 3.3;' class='header-group bg-loads'>j 端等效节点荷载</div>
-            <div style='flex: 0.8;' ></div>
-        </div>
-    """, unsafe_allow_html=True)
+    st.markdown("<div style='height: 20px'></div>", unsafe_allow_html=True)
     
-    # 🌟 修改：加入详细单位，微调列宽避免挤压
-    elem_widths = [0.8, 1, 1, 1.2, 1.2, 1.1, 1.1, 1.3, 1.1, 1.1, 1.3, 0.8]
-    e_cols = st.columns(elem_widths)
-    # 🌟 修改：加入单位
-    e_headers = ["Elem", "起(i)", "终(j)", "EA (kN)", "EI (kN·m²)", "Fxi (kN)", "Fyi (kN)", "Mzi (kN·m)", "Fxj (kN)", "Fyj (kN)", "Mzj (kN·m)", "操作"]
-    for i, h in enumerate(e_headers): e_cols[i].markdown(f"<div class='table-subheader'>{h}</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-title'>🔗 单元拓扑与属性 (Element Data)</div>", unsafe_allow_html=True)
     
-    avail_node_ids = [n['ID'] for n in st.session_state['nodes_data']]
-    
-    for i, elem in enumerate(st.session_state['elems_data']):
-        cols = st.columns(elem_widths)
-        cols[0].markdown(f"<div class='row-badge' style='border-color: #1f77b4;'>E{elem['ID']}</div>", unsafe_allow_html=True)
-        
-        idx_i = avail_node_ids.index(elem['起点']) if elem['起点'] in avail_node_ids else 0
-        idx_j = avail_node_ids.index(elem['终点']) if elem['终点'] in avail_node_ids else 0
-        
-        elem['起点'] = cols[1].selectbox(f"esi{i}", avail_node_ids, index=idx_i, key=f"e_si_{i}", label_visibility="collapsed")
-        elem['终点'] = cols[2].selectbox(f"esj{i}", avail_node_ids, index=idx_j, key=f"e_sj_{i}", label_visibility="collapsed")
-        elem['EA'] = cols[3].number_input(f"eea{i}", value=float(elem['EA']), format="%.0e", key=f"e_ea_{i}", label_visibility="collapsed")
-        elem['EI'] = cols[4].number_input(f"eei{i}", value=float(elem['EI']), key=f"e_ei_{i}", label_visibility="collapsed")
-        
-        elem['Fx_i'] = cols[5].number_input(f"fxi{i}", value=float(elem['Fx_i']), key=f"e_fxi_{i}", label_visibility="collapsed")
-        elem['Fy_i'] = cols[6].number_input(f"fyi{i}", value=float(elem['Fy_i']), key=f"e_fyi_{i}", label_visibility="collapsed")
-        elem['Mz_i'] = cols[7].number_input(f"mzi{i}", value=float(elem['Mz_i']), key=f"e_mzi_{i}", label_visibility="collapsed")
-        elem['Fx_j'] = cols[8].number_input(f"fxj{i}", value=float(elem['Fx_j']), key=f"e_fxj_{i}", label_visibility="collapsed")
-        elem['Fy_j'] = cols[9].number_input(f"fyj{i}", value=float(elem['Fy_j']), key=f"e_fyj_{i}", label_visibility="collapsed")
-        elem['Mz_j'] = cols[10].number_input(f"mzj{i}", value=float(elem['Mz_j']), key=f"e_mzj_{i}", label_visibility="collapsed")
-        
-        if cols[11].button("✖", key=f"edel_{i}"):
-            delete_elem(i); st.rerun()
-        st.markdown("<hr class='row-divider'>", unsafe_allow_html=True)
+    # 动态获取当前可用的节点 ID 列表，供单元表使用
+    valid_node_ids = edited_nodes['ID'].dropna().astype(int).astype(str).tolist() if not edited_nodes.empty else []
 
-    if st.button("➕ 增加单元 (Add Element)", key="add_elem_row"):
-        if len(avail_node_ids) >= 2:
-            new_id = max([e['ID'] for e in st.session_state['elems_data']] + [0]) + 1
-            st.session_state['elems_data'].append({"ID": new_id, "起点": avail_node_ids[0], "终点": avail_node_ids[1], "EA": 1e12, "EI": 1.0, "Fx_i": 0.0, "Fy_i": 0.0, "Mz_i": 0.0, "Fx_j": 0.0, "Fy_j": 0.0, "Mz_j": 0.0})
-            st.rerun()
+    # 🌟 单元表配置
+    edited_elems = st.data_editor(
+        st.session_state.df_elems,
+        num_rows="dynamic",
+        use_container_width=True,
+        hide_index=True,
+        column_config={
+            "ID": st.column_config.NumberColumn("Elem", required=True, step=1, format="%d"),
+            "起点": st.column_config.SelectboxColumn("起点(i)", options=valid_node_ids, required=True),
+            "终点": st.column_config.SelectboxColumn("终点(j)", options=valid_node_ids, required=True),
+            "EA": st.column_config.NumberColumn("EA (kN)", default=1e12, format="%.2e"),
+            "EI": st.column_config.NumberColumn("EI (kN·m²)", default=1.0),
+            "Fxi": st.column_config.NumberColumn("Fxi (kN)", default=0.0),
+            "Fyi": st.column_config.NumberColumn("Fyi (kN)", default=0.0),
+            "Mzi": st.column_config.NumberColumn("Mzi (kN·m)", default=0.0),
+            "Fxj": st.column_config.NumberColumn("Fxj (kN)", default=0.0),
+            "Fyj": st.column_config.NumberColumn("Fyj (kN)", default=0.0),
+            "Mzj": st.column_config.NumberColumn("Mzj (kN·m)", default=0.0),
+        },
+        key="elem_editor"
+    )
 
-    # 🚀 求解计算
-    st.markdown("<div style='height: 30px'></div>", unsafe_allow_html=True)
-    if st.button("🚀 执行矩阵位移法求解 (Solve Structure)", type="primary", use_container_width=True):
-        nodes_dict_intern = {int(n['ID']): Node(int(n['ID']), n['X'], n['Y'], [n['固X'], n['固Y'], n['固转']], [n['Fx'], n['Fy'], n['Mz']]) for n in st.session_state['nodes_data']}
-        elems_list_intern = []
-        for e in st.session_state['elems_data']:
-            try: elems_list_intern.append(Element(int(e['ID']), nodes_dict_intern[e['起点']], nodes_dict_intern[e['终点']], e['EA'], e['EI'], [e['Fx_i'], e['Fy_i'], e['Mz_i'], e['Fx_j'], e['Fy_j'], e['Mz_j']]))
-            except: pass
-        
+    # 🚀 求解逻辑
+    st.markdown("<div style='height: 20px'></div>", unsafe_allow_html=True)
+    if st.button("🚀 执行矩阵位移法求解 (Solve)", type="primary", use_container_width=True):
         try:
-            U_total, forces = solve_structure(nodes_dict_intern, elems_list_intern)
+            # 清洗数据：去除空行、填充默认值
+            df_n_clean = edited_nodes.dropna(subset=['ID']).fillna(0)
+            df_e_clean = edited_elems.dropna(subset=['ID', '起点', '终点']).fillna(0)
             
-            df_disp = pd.DataFrame([{"Node": f"N{nid}", "Ux (m)": U_total[n.dof[0]], "Uy (m)": U_total[n.dof[1]], "θz (rad)": U_total[n.dof[2]]} for nid, n in nodes_dict_intern.items()])
-            df_disp.set_index("Node", inplace=True)
+            nodes_dict_intern = {}
+            for _, r in df_n_clean.iterrows():
+                nodes_dict_intern[int(r["ID"])] = Node(int(r["ID"]), float(r["X"]), float(r["Y"]), [bool(r["固X"]), bool(r["固Y"]), bool(r["固转"])], [float(r["Fx"]), float(r["Fy"]), float(r["Mz"])])
+            
+            elems_list_intern = []
+            for _, r in df_e_clean.iterrows():
+                ni = nodes_dict_intern.get(int(r["起点"]))
+                nj = nodes_dict_intern.get(int(r["终点"]))
+                if ni and nj:
+                    elems_list_intern.append(Element(int(r["ID"]), ni, nj, float(r["EA"]), float(r["EI"]), [float(r["Fxi"]), float(r["Fyi"]), float(r["Mzi"]), float(r["Fxj"]), float(r["Fyj"]), float(r["Mzj"])]))
+            
+            if not elems_list_intern:
+                st.warning("模型无有效单元，请检查。")
+            else:
+                U_total, forces = solve_structure(nodes_dict_intern, elems_list_intern)
+                
+                # 生成位移表
+                df_disp = pd.DataFrame([{"Node": f"N{nid}", "Ux (m)": U_total[n.dof[0]], "Uy (m)": U_total[n.dof[1]], "θz (rad)": U_total[n.dof[2]]} for nid, n in nodes_dict_intern.items()]).set_index("Node")
+                
+                # 生成内力表 (多重索引合并)
+                force_data = []
+                for eid, res in forces.items():
+                    force_data.append({"Elem": f"E{eid}", "Loc": "起点", "N 轴力(kN)": res['local_i'][0], "V 剪力(kN)": res['local_i'][1], "M 弯矩(kN·m)": res['local_i'][2]})
+                    force_data.append({"Elem": f"E{eid}", "Loc": "终点", "N 轴力(kN)": res['local_j'][0], "V 剪力(kN)": res['local_j'][1], "M 弯矩(kN·m)": res['local_j'][2]})
+                df_force = pd.DataFrame(force_data).set_index(["Elem", "Loc"])
 
-            force_data = []
-            for eid, res in forces.items():
-                force_data.append({"Elem": f"E{eid}", "Loc": "起点(i)", "N 轴力(kN)": res['local_i'][0], "V 剪力(kN)": res['local_i'][1], "M 弯矩(kN·m)": res['local_i'][2]})
-                force_data.append({"Elem": f"E{eid}", "Loc": "终点(j)", "N 轴力(kN)": res['local_j'][0], "V 剪力(kN)": res['local_j'][1], "M 弯矩(kN·m)": res['local_j'][2]})
-            df_force = pd.DataFrame(force_data).sort_values(by=["Elem", "Loc"])
-            df_force.set_index(["Elem", "Loc"], inplace=True) 
+                st.session_state['analysis_results'] = {'disp': df_disp, 'force': df_force}
+                
+                # 保存当前数据状态，供绘图使用
+                st.session_state.df_nodes = df_n_clean
+                st.session_state.df_elems = df_e_clean
+                st.rerun()
 
-            st.session_state['analysis_results'] = {'disp': df_disp, 'force': df_force}
-            st.rerun()
         except Exception as e:
             st.error(f"❌ 求解失败，请检查模型约束。详细错误: {str(e)}")
 
 
 # ------------------------------------------
-# 👉 右侧面板：拓扑图 + 结果报告
+# 👉 右侧面板：视图与结果 (保持原有高质量布局)
 # ------------------------------------------
 with col_right:
     
-    st.markdown("<div class='section-title'> 结构示意图</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-title'>👁️ 结构实时渲染</div>", unsafe_allow_html=True)
     fig = go.Figure()
-    nodes_dict_intern = {int(n["ID"]): Node(int(n["ID"]), n["X"], n["Y"], [], []) for n in st.session_state['nodes_data']}
     
-    for e in st.session_state['elems_data']:
+    # 使用编辑器中的最新数据来绘图
+    current_nodes = edited_nodes.dropna(subset=['ID']).fillna(0)
+    current_elems = edited_elems.dropna(subset=['ID', '起点', '终点']).fillna(0)
+    
+    nodes_dict_viz = {int(r["ID"]): Node(int(r["ID"]), float(r["X"]), float(r["Y"]), [], []) for _, r in current_nodes.iterrows()}
+    
+    for _, r in current_elems.iterrows():
         try:
-            ni = nodes_dict_intern[e['起点']]; nj = nodes_dict_intern[e['终点']]
+            ni = nodes_dict_viz[int(r['起点'])]; nj = nodes_dict_viz[int(r['终点'])]
             fig.add_trace(go.Scatter(x=[ni.x, nj.x], y=[ni.y, nj.y], mode='lines', line=dict(color='#1f77b4', width=3), hoverinfo='none', showlegend=False))
-            fig.add_trace(go.Scatter(x=[(ni.x+nj.x)/2], y=[(ni.y+nj.y)/2], mode='text', text=[f"<b>E{e['ID']}</b>"], textposition="top center", textfont=dict(color='#0984e3', size=15), showlegend=False))
+            fig.add_trace(go.Scatter(x=[(ni.x+nj.x)/2], y=[(ni.y+nj.y)/2], mode='text', text=[f"<b>E{int(r['ID'])}</b>"], textposition="top center", textfont=dict(color='#0984e3', size=15), showlegend=False))
         except: pass
 
-    if nodes_dict_intern:
-        nx = [n.x for n in nodes_dict_intern.values()]; ny = [n.y for n in nodes_dict_intern.values()]; nt = [f"N{nid}" for nid in nodes_dict_intern.keys()]
+    if nodes_dict_viz:
+        nx = [n.x for n in nodes_dict_viz.values()]; ny = [n.y for n in nodes_dict_viz.values()]; nt = [f"N{nid}" for nid in nodes_dict_viz.keys()]
         fig.add_trace(go.Scatter(x=nx, y=ny, mode='markers+text', marker=dict(color='#d62728', size=10, line=dict(color='white', width=1)), text=nt, textposition="top right", textfont=dict(color='#343a40', size=15, weight="bold"), hoverinfo='none', showlegend=False))
 
     fig.update_layout(
@@ -266,7 +188,7 @@ with col_right:
     st.plotly_chart(fig, use_container_width=True, config={'displaylogo': False}, theme=None)
 
     st.markdown("<hr style='margin: 0.5rem 0;'>", unsafe_allow_html=True)
-    st.markdown("<div class='section-title'>📊 计算结果</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-title'>📊 实时计算报告</div>", unsafe_allow_html=True)
     
     if st.session_state['analysis_results'] is not None:
         res = st.session_state['analysis_results']
@@ -278,14 +200,12 @@ with col_right:
         m3.metric("Max |M|", f"{df_f['M 弯矩(kN·m)'].abs().max():.2f} kN·m")
         
         st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
-        
-        st.markdown("<div style='font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; color: #1f77b4;'> 节点位移 [ U ]</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; color: #1f77b4;'>📍 节点位移矩阵 [ U ]</div>", unsafe_allow_html=True)
         st.dataframe(df_d.style.set_properties(**{'font-size': '1.05rem', 'padding': '6px'}).format("{:.5e}"), use_container_width=True)
         
         st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
-        
-        st.markdown("<div style='font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; color: #d62728;'> 单元内力 [ f ]</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; color: #d62728;'>🔪 单元局部内力矩阵 [ f ]</div>", unsafe_allow_html=True)
         st.dataframe(df_f.style.set_properties(**{'font-size': '1.05rem', 'padding': '6px'}).format("{:.4f}"), use_container_width=True)
             
     else:
-        st.info("👈 请在左侧输入模型数据，并点击【执行矩阵位移法求解】获取结果。")
+        st.info("👈 请在左侧表格中输入或修改模型数据，并点击【求解】获取结果。")
