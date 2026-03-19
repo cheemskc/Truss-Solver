@@ -14,10 +14,10 @@ st.markdown("""
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
     html, body, [class*="css"] { font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; }
     
-    .block-container { padding-top: 1.5rem; max-width: 98%; }
+    /* 🌟 修复 1：将 padding-top 从 1.5rem 放大到 3rem，避开顶部导航栏的遮挡 */
+    .block-container { padding-top: 3rem; max-width: 98%; }
     
-    /* 统一左侧表格和右侧表格的视觉效果 */
-    [data-testid="stDataFrame"] { border: 1px solid #e9ecef; border-radius: 6px; }
+    /* 🌟 修复 2：彻底删除了那个生硬的表格边框，使用原生自适应边框 */
     
     .section-title { 
         font-size: 1.15rem; font-weight: 700; 
@@ -27,7 +27,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 2. 状态管理 (转为纯 DataFrame 管理)
+# 2. 状态管理
 # ==========================================
 if 'df_nodes' not in st.session_state:
     st.session_state.df_nodes = pd.DataFrame([
@@ -65,12 +65,11 @@ with col_left:
     st.markdown("<div class='section-title'>📍 节点信息</div>", unsafe_allow_html=True)
     st.caption("✨ 提示：直接点击单元格编辑。点击表格最下方可添加新行，选中行后按 Delete 键可删除。")
     
-    # 彻底告别冗长的控件生成，使用极其干净的原生可编辑表格
     edited_nodes = st.data_editor(
         st.session_state.df_nodes,
-        num_rows="dynamic",     # 开启原生的增删行功能
+        num_rows="dynamic",     
         use_container_width=True,
-        hide_index=True,        # 隐藏多余的序号列，严格匹配输出风格
+        hide_index=True,        
         column_config={
             "ID": st.column_config.NumberColumn("Node", required=True, step=1, format="%d"),
             "X": st.column_config.NumberColumn("x (m)", default=0.0, format="%.2f"),
@@ -90,7 +89,6 @@ with col_left:
     # --- 🔵 单元信息 ---
     st.markdown("<div class='section-title'>🔗 单元信息</div>", unsafe_allow_html=True)
     
-    # 动态抓取有效节点，用于下拉列表防呆保护
     valid_node_ids = edited_nodes['ID'].dropna().astype(int).astype(str).tolist() if not edited_nodes.empty else []
 
     edited_elems = st.data_editor(
@@ -118,7 +116,6 @@ with col_left:
     st.markdown("<div style='height: 30px'></div>", unsafe_allow_html=True)
     if st.button("🚀 执行矩阵位移法求解 (Solve Structure)", type="primary", use_container_width=True):
         try:
-            # 数据清洗：踢除空行，填充默认值
             df_n_clean = edited_nodes.dropna(subset=['ID']).fillna(0)
             df_e_clean = edited_elems.dropna(subset=['ID', '起点', '终点']).fillna(0)
             
@@ -150,7 +147,6 @@ with col_left:
 
                 st.session_state['analysis_results'] = {'disp': df_disp, 'force': df_force}
                 
-                # 同步保存用户的编辑状态，避免刷新丢失
                 st.session_state.df_nodes = df_n_clean
                 st.session_state.df_elems = df_e_clean
                 st.rerun()
@@ -167,7 +163,6 @@ with col_right:
     st.markdown("<div class='section-title'> 结构示意图</div>", unsafe_allow_html=True)
     fig = go.Figure()
     
-    # 🌟 优化：视图直接使用左侧编辑器里的最新数据，实现即时响应
     current_nodes = edited_nodes.dropna(subset=['ID']).fillna(0)
     current_elems = edited_elems.dropna(subset=['ID', '起点', '终点']).fillna(0)
     
@@ -205,12 +200,10 @@ with col_right:
         m3.metric("Max |M|", f"{df_f['M 弯矩(kN·m)'].abs().max():.2f} kN·m")
         
         st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
-        
         st.markdown("<div style='font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; color: #1f77b4;'> 节点位移 [ U ]</div>", unsafe_allow_html=True)
         st.dataframe(df_d.style.set_properties(**{'font-size': '1.05rem', 'padding': '6px'}).format("{:.5e}"), use_container_width=True)
         
         st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
-        
         st.markdown("<div style='font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; color: #d62728;'> 单元内力 [ f ]</div>", unsafe_allow_html=True)
         st.dataframe(df_f.style.set_properties(**{'font-size': '1.05rem', 'padding': '6px'}).format("{:.4f}"), use_container_width=True)
             
