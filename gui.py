@@ -14,10 +14,9 @@ st.markdown("""
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
     html, body, [class*="css"] { font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; }
     
-    /* 🌟 修复 1：将 padding-top 从 1.5rem 放大到 3rem，避开顶部导航栏的遮挡 */
     .block-container { padding-top: 3rem; max-width: 98%; }
     
-    /* 🌟 修复 2：彻底删除了那个生硬的表格边框，使用原生自适应边框 */
+    [data-testid="stDataFrame"] { border: 1px solid #e9ecef; border-radius: 6px; }
     
     .section-title { 
         font-size: 1.15rem; font-weight: 700; 
@@ -55,7 +54,8 @@ st.markdown("<hr style='margin-top: 0.5rem; margin-bottom: 1rem;'>", unsafe_allo
 # ==========================================
 # 4. 全局布局
 # ==========================================
-col_left, col_right = st.columns([1.6, 1.4], gap="large")
+# 🌟 核心修改：大幅加宽左侧面板（比例改为 2.2 : 1.0）
+col_left, col_right = st.columns([2.2, 1.0], gap="large")
 
 # ------------------------------------------
 # 👈 左侧面板：原生可编辑表格 UI
