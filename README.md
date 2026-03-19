@@ -1,4 +1,4 @@
-# Matrix Structural Solver Pro
+# Matrix Structural Solver
 
 <div align="center">
 
@@ -8,7 +8,7 @@
 ![Mechanics](https://img.shields.io/badge/Physics-Structural%20Mechanics-orange)
 ![License](https://img.shields.io/badge/License-MIT-lightgrey)
 
-专为结构工程与力学研究打造的二维杆系结构矩阵位移法求解引擎。
+二维杆系结构矩阵位移法求解引擎。
 
 [Calculation Principles](#计算原理-calculation-principles) • [Caveats](#计算建模注意事项-calculation-caveats) • [Quick Start](#快速开始-quick-start)
 
