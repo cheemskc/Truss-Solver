@@ -1,6 +1,8 @@
-# Matrix Structural Solver
+# Matrix Structural Solver Pro
 
 <div align="center">
+
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Open%20App-FF4B4B?style=for-the-badge&logo=streamlit)](https://truss-solver-8knkhfmdm2ggmv546hp7yt.streamlit.app/)
 
 ![Language](https://img.shields.io/badge/Python-3.9%2B-blue?logo=python)
 ![Framework](https://img.shields.io/badge/GUI-Streamlit-FF4B4B?logo=streamlit)
@@ -8,15 +10,23 @@
 ![Mechanics](https://img.shields.io/badge/Physics-Structural%20Mechanics-orange)
 ![License](https://img.shields.io/badge/License-MIT-lightgrey)
 
-二维杆系结构矩阵位移法求解引擎。
+专为结构工程与力学研究打造的二维杆系结构矩阵位移法求解引擎。
 
-[Calculation Principles](#计算原理-calculation-principles) • [Caveats](#计算建模注意事项-calculation-caveats) • [Quick Start](#快速开始-quick-start)
+[快速开始 (Quick Start)](#-快速开始-quick-start) • [计算原理 (Principles)](#-计算原理-calculation-principles) • [避坑指南 (Caveats)](#-计算建模注意事项-calculation-caveats) • [本地部署 (Local)](#-本地部署-local-deployment)
 
 </div>
 
 ---
 
-## 计算原理 (Calculation Principles)
+## 🚀 快速开始 (Quick Start)
+
+本项目已部署至云端，无需任何本地配置，推荐直接在浏览器中访问体验：
+
+👉 **[点击进入 Matrix Structural Solver 在线版](https://truss-solver-8knkhfmdm2ggmv546hp7yt.streamlit.app/)**
+
+---
+
+## 📐 计算原理 (Calculation Principles)
 
 本项目核心算法基于经典的**矩阵位移法 (Matrix Displacement Method)**：
 
@@ -38,7 +48,7 @@
 
 ---
 
-## 注意事项 (Calculation Caveats)
+## ⚠️ 计算建模注意事项 (Calculation Caveats)
 
 ### 局部坐标系与正负号约定 (Sign Conventions)
 * **全局坐标系**: $X$ 轴水平向右为正，$Y$ 轴竖直向上为正，力矩与转角均以**逆时针**方向为正。
@@ -47,7 +57,9 @@
 
 ---
 
-## 快速开始 (Quick Start)
+## 💻 本地部署 (Local Deployment)
+
+如果您需要修改底层代码或进行二次开发，可以按照以下步骤在本地运行：
 
 ### 1. 环境准备 (Requirements)
 ```bash
