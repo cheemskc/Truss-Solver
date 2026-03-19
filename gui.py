@@ -16,14 +16,13 @@ st.markdown("""
     
     .block-container { padding-top: 3rem; max-width: 98%; }
     
-    [data-testid="stDataFrame"] { border: 1px solid #e9ecef; border-radius: 6px; }
+    /* 🌟 已彻底删除强制白框代码，让表格裸机融入暗黑背景 */
     
     .section-title { 
         font-size: 1.15rem; font-weight: 700; 
         margin-bottom: 0.8rem; border-left: 4px solid #1f77b4; padding-left: 10px; 
     }
     
-    /* 专为底部居中标题设置的样式 */
     .section-title-center {
         font-size: 1.25rem; font-weight: 700; 
         margin-bottom: 1.5rem; text-align: center; color: #f8f9fa;
@@ -181,7 +180,6 @@ with col_right:
         nx = [n.x for n in nodes_dict_viz.values()]; ny = [n.y for n in nodes_dict_viz.values()]; nt = [f"N{nid}" for nid in nodes_dict_viz.keys()]
         fig.add_trace(go.Scatter(x=nx, y=ny, mode='markers+text', marker=dict(color='#d62728', size=10, line=dict(color='white', width=1)), text=nt, textposition="top right", textfont=dict(color='#343a40', size=15, weight="bold"), hoverinfo='none', showlegend=False))
 
-    # 🌟 核心修改：高度从 380 增加到 550，同时极限压缩图表内边距，使其充满整个右侧盒子
     fig.update_layout(
         template="plotly_white", 
         margin=dict(l=10, r=10, t=10, b=10),
@@ -199,14 +197,12 @@ with col_right:
 st.markdown("<hr style='margin: 1.5rem 0; border-color: #343a40;'>", unsafe_allow_html=True)
 
 if st.session_state['analysis_results'] is not None:
-    # 🌟 核心修改：独立的居中大标题
     st.markdown("<div class='section-title-center'>📊 计算结果报告</div>", unsafe_allow_html=True)
     
     res = st.session_state['analysis_results']
     df_d = res['disp']
     df_f = res['force']
     
-    # 🌟 核心修改：利用空列占位，把三大指标强行挤到屏幕正中间
     spacer1, m1, m2, m3, spacer2 = st.columns([1.5, 2, 2, 2, 1.5])
     with m1:
         st.metric("Max |Ux|", f"{df_d['Ux (m)'].abs().max() * 1000:.2f} mm")
@@ -217,7 +213,6 @@ if st.session_state['analysis_results'] is not None:
     
     st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
     
-    # 🌟 核心修改：严格 1:1 等宽的表格布局
     res_col_left, res_col_right = st.columns(2, gap="large") 
     
     with res_col_left:
