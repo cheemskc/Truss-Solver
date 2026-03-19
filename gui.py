@@ -52,9 +52,8 @@ st.markdown("<h3 style='margin-bottom: 0;'>🏗️ Matrix Structural Solver Dash
 st.markdown("<hr style='margin-top: 0.5rem; margin-bottom: 1rem;'>", unsafe_allow_html=True)
 
 # ==========================================
-# 4. 全局布局
+# 4. 上半部分布局：左[数据输入] | 右[视图]
 # ==========================================
-# 🌟 核心修改：大幅加宽左侧面板（比例改为 2.2 : 1.0）
 col_left, col_right = st.columns([2.2, 1.0], gap="large")
 
 # ------------------------------------------
@@ -156,7 +155,7 @@ with col_left:
 
 
 # ------------------------------------------
-# 👉 右侧面板：拓扑图 + 结果报告
+# 👉 右侧面板：拓扑图
 # ------------------------------------------
 with col_right:
     
@@ -187,25 +186,37 @@ with col_right:
     )
     st.plotly_chart(fig, use_container_width=True, config={'displaylogo': False}, theme=None)
 
-    st.markdown("<hr style='margin: 0.5rem 0;'>", unsafe_allow_html=True)
-    st.markdown("<div class='section-title'>📊 计算结果</div>", unsafe_allow_html=True)
+
+# ==========================================
+# 5. 底部面板：一左一右展示计算结果
+# ==========================================
+st.markdown("<hr style='margin: 1.5rem 0;'>", unsafe_allow_html=True)
+
+if st.session_state['analysis_results'] is not None:
+    st.markdown("<div class='section-title'>📊 计算结果报告</div>", unsafe_allow_html=True)
     
-    if st.session_state['analysis_results'] is not None:
-        res = st.session_state['analysis_results']
-        df_d = res['disp']; df_f = res['force']
-        
-        m1, m2, m3 = st.columns(3)
-        m1.metric("Max |Ux|", f"{df_d['Ux (m)'].abs().max() * 1000:.2f} mm")
-        m2.metric("Max |Uy|", f"{df_d['Uy (m)'].abs().max() * 1000:.2f} mm")
-        m3.metric("Max |M|", f"{df_f['M 弯矩(kN·m)'].abs().max():.2f} kN·m")
-        
-        st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
-        st.markdown("<div style='font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; color: #1f77b4;'> 节点位移 [ U ]</div>", unsafe_allow_html=True)
+    res = st.session_state['analysis_results']
+    df_d = res['disp']
+    df_f = res['force']
+    
+    # 全局核心指标
+    m1, m2, m3 = st.columns(3)
+    m1.metric("Max |Ux|", f"{df_d['Ux (m)'].abs().max() * 1000:.2f} mm")
+    m2.metric("Max |Uy|", f"{df_d['Uy (m)'].abs().max() * 1000:.2f} mm")
+    m3.metric("Max |M|", f"{df_f['M 弯矩(kN·m)'].abs().max():.2f} kN·m")
+    
+    st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
+    
+    # 🌟 底部双列布局：一左一右展开表格
+    res_col_left, res_col_right = st.columns([1, 1.2], gap="large") # 内力表列稍多，给 1.2 的宽度
+    
+    with res_col_left:
+        st.markdown("<div style='font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; color: #1f77b4;'>📍 节点位移矩阵 [ U ]</div>", unsafe_allow_html=True)
         st.dataframe(df_d.style.set_properties(**{'font-size': '1.05rem', 'padding': '6px'}).format("{:.5e}"), use_container_width=True)
         
-        st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
-        st.markdown("<div style='font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; color: #d62728;'> 单元内力 [ f ]</div>", unsafe_allow_html=True)
+    with res_col_right:
+        st.markdown("<div style='font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; color: #d62728;'>🔪 单元局部内力矩阵 [ f ]</div>", unsafe_allow_html=True)
         st.dataframe(df_f.style.set_properties(**{'font-size': '1.05rem', 'padding': '6px'}).format("{:.4f}"), use_container_width=True)
-            
-    else:
-        st.info("👈 请在左侧表格中输入或修改模型数据，并点击【求解】获取结果。")
+        
+else:
+    st.info("👈 暂无计算结果：请在上方表格中输入或修改模型数据，并点击【执行矩阵位移法求解】以获取结构响应。")
