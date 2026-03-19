@@ -1,4 +1,4 @@
-# Matrix Structural Solver Pro
+# Matrix Structural Solver
 
 <div align="center">
 
@@ -10,7 +10,7 @@
 ![Mechanics](https://img.shields.io/badge/Physics-Structural%20Mechanics-orange)
 ![License](https://img.shields.io/badge/License-MIT-lightgrey)
 
-专为结构工程与力学研究打造的二维杆系结构矩阵位移法求解引擎。
+基于矩阵位移法的二维结构力学求解器。
 
 [快速开始 (Quick Start)](#-快速开始-quick-start) • [计算原理 (Principles)](#-计算原理-calculation-principles) • [避坑指南 (Caveats)](#-计算建模注意事项-calculation-caveats) • [本地部署 (Local)](#-本地部署-local-deployment)
 
@@ -28,7 +28,7 @@
 
 ## 📐 计算原理 (Calculation Principles)
 
-本项目核心算法基于经典的**矩阵位移法 (Matrix Displacement Method)**：
+本项目核心算法基于**矩阵位移法 (Matrix Displacement Method)**：
 
 1. **局部刚度矩阵建立**: 
    对于每一个二维梁/杆单元，根据其材料弹性模量 $E$、截面面积 $A$、截面惯性矩 $I$ 以及单元长度 $L$，建立 $6 \times 6$ 的局部坐标系单元刚度矩阵 $[k^e]$。
@@ -48,7 +48,7 @@
 
 ---
 
-## ⚠️ 计算建模注意事项 (Calculation Caveats)
+## ⚠️ 注意事项 (Calculation Caveats)
 
 ### 局部坐标系与正负号约定 (Sign Conventions)
 * **全局坐标系**: $X$ 轴水平向右为正，$Y$ 轴竖直向上为正，力矩与转角均以**逆时针**方向为正。
