@@ -38,7 +38,7 @@
 
 ---
 
-## 计算建模注意事项 (Calculation Caveats)
+## 注意事项 (Calculation Caveats)
 
 ### 局部坐标系与正负号约定 (Sign Conventions)
 * **全局坐标系**: $X$ 轴水平向右为正，$Y$ 轴竖直向上为正，力矩与转角均以**逆时针**方向为正。
