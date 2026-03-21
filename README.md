@@ -12,7 +12,7 @@
 
 基于矩阵位移法的二维结构力学求解器。
 
-[快速开始 (Quick Start)](#-快速开始-quick-start) • [计算原理 (Principles)](#-计算原理-calculation-principles) • [注意事项 (Caveats)](#-注意事项-calculation-caveats) • [本地部署 (Local)](#-本地部署-local-deployment)
+[快速开始 (Quick Start)](#-快速开始-quick-start) • [计算原理 (Principles)](#-计算原理-calculation-principles) • [注意事项 (Caveats)](https://github.com/cheemskc/2D-StructSolver/blob/main/README.md#%EF%B8%8F-%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9-calculation-caveats) • [本地部署 (Local)](#-本地部署-local-deployment)
 
 </div>
 
