@@ -12,7 +12,7 @@
 
 基于矩阵位移法的二维结构力学求解器。
 
-[快速开始 (Quick Start)](#-快速开始-quick-start) • [计算原理 (Principles)](#-计算原理-calculation-principles) • [避坑指南 (Caveats)](#-计算建模注意事项-calculation-caveats) • [本地部署 (Local)](#-本地部署-local-deployment)
+[快速开始 (Quick Start)](#-快速开始-quick-start) • [计算原理 (Principles)](#-计算原理-calculation-principles) • [注意事项 (Caveats)](#-注意事项-calculation-caveats) • [本地部署 (Local)](#-本地部署-local-deployment)
 
 </div>
 
